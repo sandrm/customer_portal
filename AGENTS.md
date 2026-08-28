@@ -1,15 +1,15 @@
-# AGENTS.md — Customer Portal System Instructions
+# Customer Portal — AGENTS.md
 
-These are the persistent, mandatory instructions for every AI agent working on the **Customer Portal** backend. All code, configuration, migrations, and tests must conform to the rules below. When in doubt, apply the strictest possible interpretation.
+Persistent project-level instructions for the Customer Portal backend.
 
 ---
 
 ## 1. Project & Scope
 
 - **Name:** Customer Portal (Backend application)
-- **Description:** A backend service that enables users to **register**, **authenticate**, and **manage profiles**. The system is designed as a modular foundation for future features such as product catalog, ordering, and support.
-- **Delivery scope:** Backend Java/Spring Boot service only. Do not add frontend code, separate modules, or speculative future domain logic unless explicitly requested.
-- Always design new code as an isolated, testable component that can be extended without rewriting existing layers.
+- **Description:** A backend service that enables users to **register**, **authenticate**, and **manage profiles**.
+- **Delivery scope:** Backend Java/Spring Boot service only. Do not add frontend code, separate modules, or speculative domain logic unless explicitly requested.
+- Design new code as isolated, testable components that can be extended without rewriting existing layers.
 
 ---
 
@@ -17,10 +17,9 @@ These are the persistent, mandatory instructions for every AI agent working on t
 
 ### Java 21 (Mandatory)
 
-- Always use `record` for Data Transfer Objects (DTOs) and API responses.
-- Always prefer pattern matching for `instanceof` and `switch` expressions.
-- Always use text blocks for multi-line strings, SQL snippets, and JSON log payloads.
-- Do not use pre-Java 16 idioms where a modern language feature is applicable.
+- Use `record` for Data Transfer Objects (DTOs) and API responses.
+- Use pattern matching for `instanceof` and `switch` expressions.
+- Use text blocks for multi-line strings, SQL snippets, and JSON log payloads.
 
 ### Spring Boot 3.x (Mandatory)
 
@@ -31,11 +30,9 @@ These are the persistent, mandatory instructions for every AI agent working on t
 
 ### Spring Security 6.x (Mandatory)
 
-- Implement **stateless JWT authentication**.
-- Issue and validate separate **Access** and **Refresh** tokens.
-- Implement custom `OncePerRequestFilter` for token extraction and validation.
-- Provide a dedicated `AuthenticationEntryPoint` and `AccessDeniedHandler`.
-- Do not enable session management; the server is stateless.
+- Authentication must be **stateless** and use **JWT access and refresh tokens**.
+- Do not enable session management or rely on server-side HTTP sessions.
+- Implementation guidance is in `Skills.md` under `Implement-Stateless-JWT-Auth`.
 
 ### Database & Migrations
 
@@ -120,38 +117,28 @@ These are the persistent, mandatory instructions for every AI agent working on t
 A task is considered complete only when **all** the following conditions are satisfied:
 
 - [ ] The project compiles cleanly: `mvn clean compile` passes with no errors or warnings.
-- [ ] A Liquibase migration script has been added or updated, is atomic, timestamped, and includes a rollback.
+- [ ] A Liquibase migration script has been added or updated, is atomic, timestamped, and includes a rollback. Existing committed changesets are not modified.
 - [ ] Source code is formatted consistently with the project style.
 - [ ] New or updated unit, API, and integration tests exist and pass.
 - [ ] No JPA entity uses `@Data`, `@ToString`, or `@EqualsAndHashCode`.
+- [ ] JPA entities are not leaked into controllers or returned as JSON; DTOs/records are used.
 - [ ] No method returns `null` where `java.util.Optional` is the expected contract.
 - [ ] No `hibernate.hbm2ddl.auto=update` or `spring.jpa.hibernate.ddl-auto=update` is present.
 - [ ] No embedded H2 database is used for testing or local development.
 - [ ] No `System.out.println` or `System.err.println` calls remain in the changed code.
 - [ ] No passwords, tokens, or secrets are logged or exposed in responses.
+- [ ] Spring Security is not disabled, bypassed, or ignored in tests; the security context is mocked.
+- [ ] No speculative domain logic, modules, or tables are added unless explicitly requested.
 
 ---
 
-## 6. Prohibited Actions
+## 6. Repository Structure
 
-Do **not** perform any of the following under any circumstance:
-
-- Do not apply `@Data`, `@ToString`, or `@EqualsAndHashCode` to JPA Entities.
-- Do not return `null` from repository or service methods that can return `Optional<T>`.
-- Do not use `hibernate.hbm2ddl.auto=update` or `spring.jpa.hibernate.ddl-auto: update`.
-- Do not use an embedded H2 database for tests, local development, or demonstrations.
-- Do not disable, bypass, or ignore Spring Security in tests; always mock the authentication context.
-- Do not leak JPA Entities into Controllers or expose them as JSON responses; use DTOs/Records.
-- Do not log passwords, JWT tokens, refresh tokens, API keys, or other secrets.
-- Do not use `System.out.println` or `System.err.println` for logging.
-- Do not modify existing Liquibase changesets that have already been committed; always add a new changeset.
-- Do not create speculative future modules or tables for product catalog, ordering, or support unless explicitly requested.
-
----
-
-## 7. General Agent Behavior
-
-- Always re-read this file at the start of a session before proposing changes.
-- Always prefer minimal, focused edits over large refactors.
-- Always justify new dependencies before adding them.
-- If a requirement conflicts with these instructions, state the conflict explicitly and ask for clarification rather than assuming an override.
+- Source packages are domain-driven under `com.example.customerportal.<domain>`:
+  - Web layer: `com.example.customerportal.<domain>.web`
+  - Service layer: `com.example.customerportal.<domain>.service`
+  - Persistence layer: `com.example.customerportal.<domain>.persistence`
+  - DTOs/records: `com.example.customerportal.<domain>.dto`
+  - Exceptions: `com.example.customerportal.<domain>.exception`
+- Liquibase changelogs: `src/main/resources/db/changelog/changes/`
+- Tests mirror the `src/main/java` package structure under `src/test/java`
