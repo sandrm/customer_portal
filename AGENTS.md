@@ -147,3 +147,11 @@ A task is considered complete only when **all** the following conditions are sat
 
 - [Product Vision](docs/product/product-vision.md)
 - [Epic Map](docs/product/epic-map.md)
+
+---
+
+## 8. Backlog & User Story Processing
+
+- Before planning work, scan `docs/backlog/US-*.md` for new or updated user stories.
+- Each user story file is a source of implementation requirements and acceptance criteria.
+- Use the acceptance criteria to drive the Definition of Done for the story.
