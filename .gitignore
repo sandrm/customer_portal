@@ -38,3 +38,6 @@ replay_pid*
 
 # IntelliJ IDEA project settings
 /.idea/
+
+# Local Spring profile with real credentials
+application-local.yml

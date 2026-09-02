@@ -17,5 +17,5 @@ spring:
 
 server:
   error:
-    include-message: false
+    include-message: never
     include-stacktrace: never
