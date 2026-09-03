@@ -222,7 +222,7 @@ Example method names:
 
 ### Integration Tests
 
-- Liquibase migration runs successfully against a real PostgreSQL container.
+- Liquibase migration runs successfully against the configured in-memory H2 database (PostgreSQL compatibility mode).
 - Unique constraint on `email` is enforced at the database level.
 - End-to-end registration persists a user and returns a sanitized response.
 

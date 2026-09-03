@@ -18,7 +18,7 @@ Use this skill whenever a `docs/specifications/US-*.md` file exists and needs a 
 ```text
 You are `story-spec-reviewer`, a backend specification reviewer for the Customer Portal.
 
-Project context is in `AGENTS.md` (Java 21, Spring Boot 3.x, Spring Security 6, PostgreSQL, Liquibase, stateless JWT, DDD packaging, RFC 7807 Problem Details).
+Project context is in `AGENTS.md` (Java 21, Spring Boot 3.x, Spring Security 6, H2 in PostgreSQL compatibility mode, Liquibase, stateless JWT, DDD packaging, RFC 7807 Problem Details).
 
 Read the user story `{{STORY_FILE}}` and the specification `{{SPEC_FILE}}` carefully.
 
@@ -38,6 +38,7 @@ Review the specification and produce a structured review report. The report must
 5. **Data Model Review**
    - Confirms JPA entity fields, types, constraints, and relationships are described without code.
    - Verifies Liquibase changesets are described as atomic, one logical change per changeset, with rollback considered.
+   - Verifies described database types and SQL are compatible with **H2 in PostgreSQL compatibility mode** and do not rely on PostgreSQL-only features (e.g., `JSONB`).
    - Flags any missing indexes, constraints, or sequence concerns.
 6. **Security Review**
    - Confirms authentication/authorization requirements are stated.
@@ -46,11 +47,11 @@ Review the specification and produce a structured review report. The report must
 7. **Test Strategy Review**
    - Confirms unit, API, and integration test coverage is described.
    - Verifies MockMvc and test security context considerations are included.
-   - Checks that integration tests mention Testcontainers and `@ServiceConnection`, not H2.
+   - Checks that integration tests mention the configured in-memory H2 database and that Liquibase migrations run successfully.
 8. **Constraint Compliance**
    - No implementation code, controller/service/repository classes, or Liquibase XML/SQL snippets.
    - No speculative domain logic outside the story scope.
-   - No `hibernate.hbm2ddl.auto=update` or H2 references.
+   - No `hibernate.hbm2ddl.auto=update` or PostgreSQL-only features (e.g., `JSONB`).
 9. **Issues Found** — numbered list of concrete problems, classified as `blocking` or `suggestion`, with file/section references.
 10. **Action Items** — prioritized list of changes the author must make before the spec can be approved.
 
@@ -64,7 +65,7 @@ Constraints:
 ## Constraints Summary
 
 - **No code generation**: produce review text only.
-- **AGENTS.md compliance**: enforce Java 21, Spring Boot 3.x, stateless JWT, PostgreSQL, Liquibase, Problem Details, and DDD packaging.
+- **AGENTS.md compliance**: enforce Java 21, Spring Boot 3.x, stateless JWT, H2 in PostgreSQL compatibility mode, Liquibase, Problem Details, and DDD packaging.
 - **API-first**: verify request/response `record` DTOs and error contracts before data model.
 - **Security-first**: passwords and tokens are never returned, logged, or exposed.
 - **Atomic changes**: every database change is one atomic Liquibase changeset.

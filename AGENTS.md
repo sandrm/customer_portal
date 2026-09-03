@@ -36,12 +36,13 @@ Persistent project-level instructions for the Customer Portal backend.
 
 ### Database & Migrations
 
-- **PostgreSQL** is the only supported database.
+- **H2** is the supported database for local development and testing, running in **PostgreSQL compatibility mode**.
 - **Liquibase** is the only authorized migration tool.
 - Every changeset must be:
   - Atomic (one logical change per changeset).
   - Stored in a timestamped file (e.g., `db/changelog/changes/YYYYMMDD_HHMMSS__description.xml` or `.sql`).
   - Accompanied by a valid `<rollback>` script or `rollbackSQL`.
+- Liquibase changesets must use H2-compatible SQL and avoid PostgreSQL-only features (e.g., `JSONB`).
 - Do not use `hibernate.hbm2ddl.auto=update`, `spring.jpa.hibernate.ddl-auto=update`, or any other schema auto-generation.
 
 ### Lombok
@@ -104,10 +105,8 @@ Persistent project-level instructions for the Customer Portal backend.
 
 ### Integration Tests
 
-- Use **Testcontainers** with a real PostgreSQL instance.
-- Use Spring Boot 3.x native **`@ServiceConnection`** to wire the container.
+- Use the configured in-memory **H2** database (in PostgreSQL compatibility mode) for integration tests.
 - **Do not use the legacy `@DynamicPropertySource` pattern.**
-- Do not use an embedded H2 database for any test.
 - Always assert that Liquibase migrations run successfully in the test context.
 
 ---
@@ -124,7 +123,7 @@ A task is considered complete only when **all** the following conditions are sat
 - [ ] JPA entities are not leaked into controllers or returned as JSON; DTOs/records are used.
 - [ ] No method returns `null` where `java.util.Optional` is the expected contract.
 - [ ] No `hibernate.hbm2ddl.auto=update` or `spring.jpa.hibernate.ddl-auto=update` is present.
-- [ ] No embedded H2 database is used for testing or local development.
+- [ ] H2 in-memory database is configured for local development and testing.
 - [ ] No `System.out.println` or `System.err.println` calls remain in the changed code.
 - [ ] No passwords, tokens, or secrets are logged or exposed in responses.
 - [ ] Spring Security is not disabled, bypassed, or ignored in tests; the security context is mocked.
