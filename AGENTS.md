@@ -36,13 +36,14 @@ Persistent project-level instructions for the Customer Portal backend.
 
 ### Database & Migrations
 
-- **PostgreSQL** is the only supported database.
-- **Liquibase** is the only authorized migration tool.
+- **H2** is the only supported database.
+- H2 runs in **PostgreSQL compatibility mode** (`MODE=PostgreSQL`).
+- **Liquibase** is the only authorized migration tool; every changeset must be H2/PostgreSQL-mode compatible.
 - Every changeset must be:
   - Atomic (one logical change per changeset).
   - Stored in a timestamped file (e.g., `db/changelog/changes/YYYYMMDD_HHMMSS__description.xml` or `.sql`).
   - Accompanied by a valid `<rollback>` script or `rollbackSQL`.
-- Do not use `hibernate.hbm2ddl.auto=update`, `spring.jpa.hibernate.ddl-auto=update`, or any other schema auto-generation.
+- For local/in-memory development without Liquibase, `spring.jpa.hibernate.ddl-auto=update` may be used; otherwise, schema changes are managed by Liquibase.
 
 ### Lombok
 
@@ -104,10 +105,9 @@ Persistent project-level instructions for the Customer Portal backend.
 
 ### Integration Tests
 
-- Use **Testcontainers** with a real PostgreSQL instance.
-- Use Spring Boot 3.x native **`@ServiceConnection`** to wire the container.
+- Use the in-memory database and datasource settings described in `### Database & Migrations`.
+- Do not rely on external production-like database instances for tests.
 - **Do not use the legacy `@DynamicPropertySource` pattern.**
-- Do not use an embedded H2 database for any test.
 - Always assert that Liquibase migrations run successfully in the test context.
 
 ---
@@ -123,8 +123,8 @@ A task is considered complete only when **all** the following conditions are sat
 - [ ] No JPA entity uses `@Data`, `@ToString`, or `@EqualsAndHashCode`.
 - [ ] JPA entities are not leaked into controllers or returned as JSON; DTOs/records are used.
 - [ ] No method returns `null` where `java.util.Optional` is the expected contract.
-- [ ] No `hibernate.hbm2ddl.auto=update` or `spring.jpa.hibernate.ddl-auto=update` is present.
-- [ ] No embedded H2 database is used for testing or local development.
+- [ ] Schema management follows the rules in `### Database & Migrations`.
+- [ ] The database/migration setup configured in `### Database & Migrations` is used for testing and local development.
 - [ ] No `System.out.println` or `System.err.println` calls remain in the changed code.
 - [ ] No passwords, tokens, or secrets are logged or exposed in responses.
 - [ ] Spring Security is not disabled, bypassed, or ignored in tests; the security context is mocked.
