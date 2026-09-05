@@ -40,4 +40,4 @@ replay_pid*
 /.idea/
 
 # Local Spring profile with real credentials
-application-local.yml
+# application-local.yml

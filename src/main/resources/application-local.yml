@@ -1,0 +1,29 @@
+# Local development profile.
+# This file is gitignored; put your local database credentials here.
+
+spring:
+  application:
+    name: customer-portal
+  datasource:
+    url: jdbc:h2:mem:customer_portal;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    hikari:
+      maximum-pool-size: 10
+    driver-class-name: org.h2.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
